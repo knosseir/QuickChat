@@ -7,13 +7,24 @@
     tools:context="com.example.admin.chatapp.AboutActivity">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/lahacks"/>
+        android:layout_width="395dp"
+        android:layout_height="587dp"
+        android:src="@drawable/lahacks"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp"
+        android:id="@+id/lahacks"/>
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="This application was created by Kareem Nosseir at LA Hacks 2017!"/>
+        android:layout_width="0dp"
+        android:layout_height="587dp"
+        android:text="This application was created by Kareem Nosseir at LA Hacks 2017!"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Take Picture"
+        android:onClick="dispatchTakePictureIntent"/>
 
 </android.support.constraint.ConstraintLayout>

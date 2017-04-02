@@ -64,16 +64,14 @@
             android:gravity="center"/>
 
     </LinearLayout>
-    <TextView
+
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/textPrimaryDark"
-        android:textSize="14sp"
-        android:text="@string/note"
-        android:layout_marginLeft="16dp"
-        android:textAlignment="center"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="26dp"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:text="Skip Authentication"
+        android:onClick="skipAuthentication"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="48dp"/>
 
 </RelativeLayout>
