@@ -491,12 +491,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // User is already signed in. Therefore, display
             // a welcome Toast
-            Toast.makeText(this,
-                    "Welcome, " + FirebaseAuth.getInstance()
-                            .getCurrentUser()
-                            .getDisplayName() + "!",
-                    Toast.LENGTH_LONG)
-                    .show();
+            String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+
+            if (username == null) Toast.makeText(this, "Welcome, Guest!", Toast.LENGTH_LONG).show();
+
+            else Toast.makeText(this, "Welcome, " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName() + "!", Toast.LENGTH_LONG).show();
 
             // Load chat room contents
             displayChatMessages();
@@ -516,14 +515,7 @@ public class MainActivity extends AppCompatActivity {
                     toast.show();
                     return;
                 }
-                FirebaseDatabase.getInstance()
-                        .getReference()
-                        .push()
-                        .setValue(new ChatMessage(input.getText().toString(),
-                                FirebaseAuth.getInstance()
-                                        .getCurrentUser()
-                                        .getDisplayName())
-                        );
+                push(input.getText().toString());
 
                 // Clear the input
                 input.setText("");
@@ -539,7 +531,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch(position) {
+                switch (position) {
                     case 0:
                         // go to settings menu
                         Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
@@ -564,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Navigation!");
+                getSupportActionBar().setTitle("Navigation!");  // TODO: nav drawer should cover title bar (as per material design)
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
@@ -618,26 +610,14 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == SIGN_IN_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                Toast.makeText(this,
-                        "Successfully signed in. Welcome!",
-                        Toast.LENGTH_LONG)
-                        .show();
+                Toast.makeText(this, "Successfully signed in. Welcome!", Toast.LENGTH_LONG).show();
                 displayChatMessages();
             } else {
-                Toast.makeText(this,
-                        "We couldn't sign you in. Please try again later.",
-                        Toast.LENGTH_LONG)
-                        .show();
-
+                Toast.makeText(this, "We couldn't sign you in. Please try again later.", Toast.LENGTH_LONG).show();
                 // Close the app
                 finish();
             }
         }
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
     }
 
     @Override
@@ -647,45 +627,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void signOff() {
-        AuthUI.getInstance().signOut(this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(MainActivity.this,
-                                "You have been signed out.",
-                                Toast.LENGTH_LONG)
-                                .show();
+        AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(MainActivity.this, "You have been signed out.", Toast.LENGTH_LONG).show();
 
-                        // Close activity
-                        Intent mStartActivity = new Intent(getBaseContext(), MainActivity.class);
-                        int mPendingIntentId = 123456;
-                        PendingIntent mPendingIntent = PendingIntent.getActivity(getBaseContext(), mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-                        AlarmManager mgr = (AlarmManager) getBaseContext().getSystemService(Context.ALARM_SERVICE);
-                        mgr.set(AlarmManager.RTC, System.currentTimeMillis(), mPendingIntent);
-                        finish();
-                    }
-                });
+                // Close activity
+                Intent mStartActivity = new Intent(getBaseContext(), SplashActivity.class);
+                int mPendingIntentId = 123456;
+                PendingIntent mPendingIntent = PendingIntent.getActivity(getBaseContext(), mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager mgr = (AlarmManager) getBaseContext().getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC, System.currentTimeMillis(), mPendingIntent);
+                finish();
+            }
+        });
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_sign_out) {
-           signOff();
-        } else if (item.getItemId() == R.id.menu_about) {
-            Intent myIntent = new Intent(MainActivity.this, AboutActivity.class);
-            MainActivity.this.startActivity(myIntent);
-        }
-
-        //noinspection SimplifiableIfStatement
-        else if (item.getItemId() == R.id.action_settings) {
-            return true;
-        }
-
         // Activate the navigation drawer toggle
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void push(String msg) {
+        // Read the input field and push a new instance
+        // of ChatMessage to the Firebase database
+        String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        if (username == null) {
+            FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest"));
+            Toast.makeText(this, "You are chatting as a guest.", Toast.LENGTH_SHORT).show();
+        }
+        else FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, username));
     }
 
     public void chromeCustomTab(MenuItem item) {
@@ -695,26 +670,12 @@ public class MainActivity extends AppCompatActivity {
         EditText input = (EditText) findViewById(R.id.input);
         input.setText(urls[urlNum]);
 
-        // Read the input field and push a new instance
-        // of ChatMessage to the Firebase database
-        FirebaseDatabase.getInstance()
-                .getReference()
-                .push()
-                .setValue(new ChatMessage(input.getText().toString(),
-                        FirebaseAuth.getInstance()
-                                .getCurrentUser()
-                                .getDisplayName())
-                );
+        push(input.getText().toString());
 
         // Clear the input
         input.setText("");
 
-        Context context = getApplicationContext();
-        CharSequence text = "Sent random Wikipedia link!";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
+        Toast.makeText(this, "Sent random Wikipedia link!", Toast.LENGTH_SHORT).show();
 
         mCustomTabsIntent.launchUrl(this, Uri.parse(urls[urlNum]));
     }
@@ -726,26 +687,12 @@ public class MainActivity extends AppCompatActivity {
         EditText input = (EditText) findViewById(R.id.input);
         input.setText(videos[urlNum]);
 
-        // Read the input field and push a new instance
-        // of ChatMessage to the Firebase database
-        FirebaseDatabase.getInstance()
-                .getReference()
-                .push()
-                .setValue(new ChatMessage(input.getText().toString(),
-                        FirebaseAuth.getInstance()
-                                .getCurrentUser()
-                                .getDisplayName())
-                );
+        push(input.getText().toString());
 
         // Clear the input
         input.setText("");
 
-        Context context = getApplicationContext();
-        CharSequence text = "Sent random YouTube video!";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
+        Toast.makeText(this, "Sent random YouTube video!", Toast.LENGTH_SHORT).show();
 
         mCustomTabsIntent.launchUrl(this, Uri.parse(videos[urlNum]));
     }
