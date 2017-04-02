@@ -10,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -458,6 +459,11 @@ public class MainActivity extends AppCompatActivity {
 
                 // Read the input field and push a new instance
                 // of ChatMessage to the Firebase database
+                if (input.getText().toString().matches("")) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "You must input a message!", Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                }
                 FirebaseDatabase.getInstance()
                         .getReference()
                         .push()
