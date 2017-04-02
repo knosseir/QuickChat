@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -495,7 +496,8 @@ public class MainActivity extends AppCompatActivity {
 
             if (username == null) Toast.makeText(this, "Welcome, Guest!", Toast.LENGTH_LONG).show();
 
-            else Toast.makeText(this, "Welcome, " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName() + "!", Toast.LENGTH_LONG).show();
+            else
+                Toast.makeText(this, "Welcome, " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName() + "!", Toast.LENGTH_LONG).show();
 
             // Load chat room contents
             displayChatMessages();
@@ -590,6 +592,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView messageText = (TextView) v.findViewById(R.id.message_text);
                 TextView messageUser = (TextView) v.findViewById(R.id.message_user);
                 TextView messageTime = (TextView) v.findViewById(R.id.message_time);
+                ImageView messageUserPic = (ImageView) v.findViewById(R.id.message_user_pic);
 
                 // Set their text
                 messageText.setText(model.getMessageText());
@@ -598,6 +601,8 @@ public class MainActivity extends AppCompatActivity {
                 // Format the date before showing it
                 messageTime.setText(DateFormat.format("M/dd/yyyy (h:mm a)",
                         model.getMessageTime()));
+
+               if (model.getMessageUserPic() != null) messageUserPic.setImageURI(model.getMessageUserPic());
             }
         };
 
@@ -654,11 +659,22 @@ public class MainActivity extends AppCompatActivity {
         // Read the input field and push a new instance
         // of ChatMessage to the Firebase database
         String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-        if (username == null) {
+        Uri userpic = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
+
+        if (userpic == null && username != null) {
+            Toast.makeText(this, "No user image!", Toast.LENGTH_SHORT).show();
+            FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, username));
+        }
+        else if (userpic == null && username == null) {
             FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest"));
             Toast.makeText(this, "You are chatting as a guest.", Toast.LENGTH_SHORT).show();
         }
-        else FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, username));
+        else if (userpic != null && username == null)
+            // FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest", userpic));
+            FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest"));
+        else
+            // FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, username, userpic));
+            FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, username));
     }
 
     public void chromeCustomTab(MenuItem item) {

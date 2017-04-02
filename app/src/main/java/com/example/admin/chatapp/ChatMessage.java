@@ -1,5 +1,9 @@
 package com.example.admin.chatapp;
 
+import android.net.Uri;
+import android.util.Log;
+import android.widget.Toast;
+
 import java.util.Date;
 
 public class ChatMessage {
@@ -7,10 +11,20 @@ public class ChatMessage {
     private String messageText;
     private String messageUser;
     private long messageTime;
+    private Uri messageUserPic;
 
     public ChatMessage(String messageText, String messageUser) {
         this.messageText = messageText;
         this.messageUser = messageUser;
+
+        // Initialize to current time
+        messageTime = new Date().getTime();
+    }
+
+    public ChatMessage(String messageText, String messageUser, Uri messageUserPic) {
+        this.messageText = messageText;
+        this.messageUser = messageUser;
+        this.messageUserPic = messageUserPic;
 
         // Initialize to current time
         messageTime = new Date().getTime();
@@ -43,4 +57,6 @@ public class ChatMessage {
     public void setMessageTime(long messageTime) {
         this.messageTime = messageTime;
     }
+
+    public Uri getMessageUserPic() { return messageUserPic; }
 }
