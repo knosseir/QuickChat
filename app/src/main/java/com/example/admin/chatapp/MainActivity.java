@@ -645,9 +645,7 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(MenuItem item) {
         // Activate the navigation drawer toggle
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
+        if (mDrawerToggle.onOptionsItemSelected(item)) return true;
 
         return super.onOptionsItemSelected(item);
     }
