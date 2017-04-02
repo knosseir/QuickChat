@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_wiki"
+        android:icon="@drawable/wiki"
+        android:title="Wiki Link"
+        app:showAsAction="always"
+        android:onClick="chromeCustomTab"/>
+    <item
+        android:id="@+id/action_youtube"
+        android:icon="@drawable/youtube"
+        android:title="YouTube Video"
+        app:showAsAction="always"
+        android:onClick="chromeCustomTabVid"/>
+    <item
+        android:id="@+id/action_image"
+        android:icon="@drawable/ic_image_black_24dp"
+        android:title="Image"
+        app:showAsAction="always"/>
+</menu>
