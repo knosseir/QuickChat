@@ -523,6 +523,19 @@ public class MainActivity extends AppCompatActivity {
                 input.setText("");
             }
         });
+        ListView messageText = (ListView) findViewById(R.id.list_of_messages);
+
+        messageText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ChatMessage chat = (ChatMessage) parent.getItemAtPosition(position);
+                String message = chat.getMessageText();
+               // Toast.makeText(getApplicationContext(), message.substring(0, 4), Toast.LENGTH_SHORT).show();
+                if (message.substring(0, 4).equals("http")) {
+                    mCustomTabsIntent.launchUrl(getApplicationContext(), Uri.parse(message));
+                }
+            }
+        });
     }
 
     private void addDrawerItems() {
