@@ -450,7 +450,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDrawerList = (ListView)findViewById(R.id.navList);mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.navList);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mActivityTitle = getTitle().toString();
 
         addDrawerItems();
@@ -531,17 +532,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addDrawerItems() {
-        String[] osArray = { "Settings" };
+        String[] osArray = {"Settings", "About", "Sign out"};
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, osArray);
         mDrawerList.setAdapter(mAdapter);
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0) {
-                    // go to settings menu
-                    Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                    MainActivity.this.startActivity(myIntent);                }
+                switch(position) {
+                    case 0:
+                        // go to settings menu
+                        Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                        MainActivity.this.startActivity(myIntent);
+                        break;
+                    case 1:
+                        // go to about page
+                        myIntent = new Intent(MainActivity.this, AboutActivity.class);
+                        MainActivity.this.startActivity(myIntent);
+                        break;
+                    case 2:
+                        // sign out
+                        signOff();
+                }
             }
         });
     }
@@ -634,26 +646,30 @@ public class MainActivity extends AppCompatActivity {
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    public void signOff() {
+        AuthUI.getInstance().signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(MainActivity.this,
+                                "You have been signed out.",
+                                Toast.LENGTH_LONG)
+                                .show();
+
+                        // Close activity
+                        Intent mStartActivity = new Intent(getBaseContext(), MainActivity.class);
+                        int mPendingIntentId = 123456;
+                        PendingIntent mPendingIntent = PendingIntent.getActivity(getBaseContext(), mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                        AlarmManager mgr = (AlarmManager) getBaseContext().getSystemService(Context.ALARM_SERVICE);
+                        mgr.set(AlarmManager.RTC, System.currentTimeMillis(), mPendingIntent);
+                        finish();
+                    }
+                });
+    }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_sign_out) {
-            AuthUI.getInstance().signOut(this)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Toast.makeText(MainActivity.this,
-                                    "You have been signed out.",
-                                    Toast.LENGTH_LONG)
-                                    .show();
-
-                            // Close activity
-                            Intent mStartActivity = new Intent(getBaseContext(), MainActivity.class);
-                            int mPendingIntentId = 123456;
-                            PendingIntent mPendingIntent = PendingIntent.getActivity(getBaseContext(), mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-                            AlarmManager mgr = (AlarmManager) getBaseContext().getSystemService(Context.ALARM_SERVICE);
-                            mgr.set(AlarmManager.RTC, System.currentTimeMillis(), mPendingIntent);
-                            finish();
-                        }
-                    });
+           signOff();
         } else if (item.getItemId() == R.id.menu_about) {
             Intent myIntent = new Intent(MainActivity.this, AboutActivity.class);
             MainActivity.this.startActivity(myIntent);
