@@ -6,6 +6,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsClient;
@@ -19,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,23 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int SIGN_IN_REQUEST_CODE = 100;
     private FirebaseListAdapter<ChatMessage> adapter;
 
-    final String CUSTOM_TAB_PACKAGE_NAME = "com.android.chrome";
-
-    final String[] urls =
-            {"https://en.wikipedia.org/wiki/List_of_Eiffel_Tower_replicas",
-                    "https://en.wikipedia.org/wiki/Gravity_hill",
-                    "https://en.wikipedia.org/wiki/List_of_tautological_place_names",
-                    "https://en.wikipedia.org/wiki/Pizza_farm",
-                    "https://en.wikipedia.org/wiki/Nail_house",
-                    "https://en.wikipedia.org/wiki/Leaning_Tower_of_Suurhusen",
-                    "https://en.wikipedia.org/wiki/Centralia,_Pennsylvania",
-                    "https://en.wikipedia.org/wiki/Florence_Y%27all_Water_Tower",
-                    "https://en.wikipedia.org/wiki/Michigan_left",
-                    "https://en.wikipedia.org/wiki/Ragged_Ass_Road_(street)",
-                    "https://en.wikipedia.org/wiki/Rough_and_Ready,_California",
-                    "https://en.wikipedia.org/wiki/World%27s_littlest_skyscraper",
-                    "https://en.wikipedia.org/wiki/Winchester_Mystery_House"
-            };
+    final String RANDOM_WIKI_LINK = "https://en.wikipedia.org/wiki/Special:Random";
 
     final String[] videos =
             {
@@ -435,10 +423,8 @@ public class MainActivity extends AppCompatActivity {
             };
     int urlNum;
 
-    CustomTabsClient mCustomTabsClient;
-    CustomTabsSession mCustomTabsSession;
-    CustomTabsServiceConnection mCustomTabsServiceConnection;
-    CustomTabsIntent mCustomTabsIntent;
+    private CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+    private final CustomTabsIntent mCustomTabsIntent = builder.build();
 
     private ListView mDrawerList;
     private DrawerLayout mDrawerLayout;
@@ -461,25 +447,13 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        mCustomTabsServiceConnection = new CustomTabsServiceConnection() {
-            @Override
-            public void onCustomTabsServiceConnected(ComponentName componentName, CustomTabsClient customTabsClient) {
-                mCustomTabsClient = customTabsClient;
-                mCustomTabsClient.warmup(0L);
-                mCustomTabsSession = mCustomTabsClient.newSession(null);
-            }
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_send_black_24dp);
+        Intent actionIntent = new Intent(Intent.ACTION_MAIN);
 
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                mCustomTabsClient = null;
-            }
-        };
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, actionIntent, 0);
 
-        CustomTabsClient.bindCustomTabsService(this, CUSTOM_TAB_PACKAGE_NAME, mCustomTabsServiceConnection);
-
-        mCustomTabsIntent = new CustomTabsIntent.Builder(mCustomTabsSession)
-                .setShowTitle(true)
-                .build();
+        builder.setToolbarColor(0x3F51B5);  // TODO: use Color.parseColor to make this robust
+        builder.setActionButton(icon, "Share link", pendingIntent, true);
 
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             // Start sign in/sign up activity
@@ -530,10 +504,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ChatMessage chat = (ChatMessage) parent.getItemAtPosition(position);
                 String message = chat.getMessageText();
-               // Toast.makeText(getApplicationContext(), message.substring(0, 4), Toast.LENGTH_SHORT).show();
-                if (message.substring(0, 4).equals("http")) {
+                if (Patterns.WEB_URL.matcher(message).matches())    // if message is a valid URL, then open it in a Chrome Custom Tab
                     mCustomTabsIntent.launchUrl(getApplicationContext(), Uri.parse(message));
-                }
             }
         });
     }
@@ -615,7 +587,8 @@ public class MainActivity extends AppCompatActivity {
                 messageTime.setText(DateFormat.format("M/dd/yyyy (h:mm a)",
                         model.getMessageTime()));
 
-               if (model.getMessageUserPic() != null) messageUserPic.setImageURI(model.getMessageUserPic());
+                if (model.getMessageUserPic() != null)
+                    messageUserPic.setImageURI(model.getMessageUserPic());
             }
         };
 
@@ -677,12 +650,10 @@ public class MainActivity extends AppCompatActivity {
         if (userpic == null && username != null) {
             Toast.makeText(this, "No user image!", Toast.LENGTH_SHORT).show();
             FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, username));
-        }
-        else if (userpic == null && username == null) {
+        } else if (userpic == null && username == null) {
             FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest"));
             Toast.makeText(this, "You are chatting as a guest.", Toast.LENGTH_SHORT).show();
-        }
-        else if (userpic != null && username == null)
+        } else if (userpic != null && username == null)
             // FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest", userpic));
             FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest"));
         else
@@ -691,20 +662,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void chromeCustomTab(MenuItem item) {
-        Random rand = new Random();
-        urlNum = rand.nextInt(urls.length);
+        Toast.makeText(this, "Opened random Wikipedia link!", Toast.LENGTH_SHORT).show();
 
-        EditText input = (EditText) findViewById(R.id.input);
-        input.setText(urls[urlNum]);
-
-        push(input.getText().toString());
-
-        // Clear the input
-        input.setText("");
-
-        Toast.makeText(this, "Sent random Wikipedia link!", Toast.LENGTH_SHORT).show();
-
-        mCustomTabsIntent.launchUrl(this, Uri.parse(urls[urlNum]));
+        mCustomTabsIntent.launchUrl(this, Uri.parse(RANDOM_WIKI_LINK));
+        //push(mCustomTabsIntent.getDataString());
     }
 
     public void chromeCustomTabVid(MenuItem item) {
