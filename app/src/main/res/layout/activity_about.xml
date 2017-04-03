@@ -1,30 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.admin.chatapp.AboutActivity">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/blurb"
+        android:text="@string/about_blurb"
+        android:textStyle="normal|bold"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="12dp"
+        android:textAlignment="center"/>
 
     <ImageView
-        android:layout_width="395dp"
-        android:layout_height="587dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/blurb"
         android:src="@drawable/lahacks"
-        tools:layout_editor_absoluteY="8dp"
-        tools:layout_editor_absoluteX="8dp"
         android:id="@+id/lahacks"/>
 
     <TextView
-        android:layout_width="0dp"
-        android:layout_height="587dp"
-        android:text="This application was created by Kareem Nosseir at LA Hacks 2017!"
-        tools:layout_editor_absoluteY="8dp"
-        tools:layout_editor_absoluteX="8dp" />
-
-    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Take Picture"
-        android:onClick="dispatchTakePictureIntent"/>
+        android:id="@+id/attributions"
+        android:text="@string/attributions"
+        android:layout_below="@id/lahacks"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:textAlignment="center"/>
 
-</android.support.constraint.ConstraintLayout>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_insert_emoticon_black_24dp"
+        android:layout_below="@id/attributions"
+        android:layout_marginBottom="4dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/emoticon"/>
+
+</RelativeLayout>

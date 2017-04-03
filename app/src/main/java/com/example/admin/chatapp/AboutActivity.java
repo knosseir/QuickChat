@@ -1,5 +1,7 @@
 package com.example.admin.chatapp;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -18,15 +20,9 @@ public class AboutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-        Context context = getApplicationContext();
-        CharSequence text = "About!";
-        int duration = Toast.LENGTH_SHORT;
 
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-
-        ImageView image = (ImageView) findViewById(R.id.lahacks);
-        image.animate().rotation(360).setDuration(1000).setStartDelay(500);
+        ImageView image = (ImageView) findViewById(R.id.emoticon);
+        image.animate().rotation(360 * 3).setDuration(1000);
     }
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
