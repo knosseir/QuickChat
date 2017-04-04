@@ -17,6 +17,7 @@ import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -49,6 +50,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Random;
+
+import static com.example.admin.chatapp.R.layout.nav_header;
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -485,10 +489,18 @@ public class MainActivity extends AppCompatActivity {
             // a welcome Toast
             String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
 
-            if (username == null) Toast.makeText(this, "Welcome, Guest!", Toast.LENGTH_LONG).show();
+            if (username == null) {
+                Toast.makeText(this, "Welcome, Guest!", Toast.LENGTH_LONG).show();
+                TextView tv = (TextView)findViewById(R.id.header);  // TODO: CAN'T FIND R.ID.HEADER FOR SOME REASON, CAUSES NULLPOINTEREXCEPTION
+                tv.setText("Guest");
+            }
 
-            else
+            else {
                 Toast.makeText(this, "Welcome, " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName() + "!", Toast.LENGTH_LONG).show();
+                //setContentView(R.layout.nav_header);
+                //TextView tv = (TextView) findViewById(R.id.header);
+                //tv.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+            }
 
             // Load chat room contents
             displayChatMessages();
@@ -547,32 +559,41 @@ public class MainActivity extends AppCompatActivity {
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
-        Class fragmentClass;
+        Class fragmentClass = null;
 
         switch(menuItem.getItemId()) {
-            case R.id.nav_first_fragment:
-                Toast.makeText(getApplicationContext(), "menu", Toast.LENGTH_SHORT).show();
+            case R.id.chat_fragment:
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.help_fragment:
                 fragmentClass = AboutFragment.class;
                 break;
-            case R.id.nav_second_fragment:
+            case R.id.about_fragment:
                 fragmentClass = AboutFragment.class;
                 break;
-            case R.id.nav_third_fragment:
-                fragmentClass = AboutFragment.class;
+            case R.id.settings_fragment:
+                intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.signoff_fragment:
+                signOff();
                 break;
             default:
                 fragmentClass = AboutFragment.class;
         }
 
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        if (fragmentClass != null) {
+            try {
+                fragment = (Fragment) fragmentClass.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        // Insert the fragment by replacing any existing fragment
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();      // TODO: Fragment launched is overlayed onto current Activity
+            // Insert the fragment by replacing any existing fragment
+            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+        }
 
         // Highlight the selected item has been done by NavigationView
         menuItem.setChecked(true);
@@ -667,11 +688,13 @@ public class MainActivity extends AppCompatActivity {
         Uri userpic = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
 
         if (userpic == null && username != null) {
-            Toast.makeText(this, "No user image!", Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(android.R.id.content), "No user image!", Snackbar.LENGTH_SHORT)
+                    .show();
             FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, username));
         } else if (userpic == null && username == null) {
             FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest"));
-            Toast.makeText(this, "You are chatting as a guest.", Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(android.R.id.content), "You are chatting as a guest.", Snackbar.LENGTH_LONG)
+                    .show();
         } else if (userpic != null && username == null)
             // FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest", userpic));
             FirebaseDatabase.getInstance().getReference().push().setValue(new ChatMessage(msg, "Guest"));
@@ -681,7 +704,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void chromeCustomTab(MenuItem item) {
-        Toast.makeText(this, "Opened random Wikipedia link!", Toast.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(android.R.id.content), "Opened random Wikipedia link!", Snackbar.LENGTH_SHORT).show();
 
         mCustomTabsIntent.launchUrl(this, Uri.parse(RANDOM_WIKI_LINK));
         //push(mCustomTabsIntent.getDataString());
@@ -699,7 +722,7 @@ public class MainActivity extends AppCompatActivity {
         // Clear the input
         input.setText("");
 
-        Toast.makeText(this, "Sent random YouTube video!", Toast.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(android.R.id.content), "Sent random YouTube video!", Snackbar.LENGTH_SHORT).show();
 
         mCustomTabsIntent.launchUrl(this, Uri.parse(videos[urlNum]));
     }

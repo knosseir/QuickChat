@@ -2,17 +2,25 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_first_fragment"
-            android:icon="@drawable/ic_one"
-            android:title="First" />
+            android:id="@+id/chat_fragment"
+            android:icon="@drawable/ic_chat_black_24dp"
+            android:title="Chat" />
         <item
-            android:id="@+id/nav_second_fragment"
-            android:icon="@drawable/ic_two"
-            android:title="Second" />
+            android:id="@+id/help_fragment"
+            android:icon="@drawable/ic_help_black_24dp"
+            android:title="Help" />
         <item
-            android:id="@+id/nav_third_fragment"
-            android:icon="@drawable/ic_three"
-            android:title="Third" />
+            android:id="@+id/about_fragment"
+            android:icon="@drawable/ic_info_black_24dp"
+            android:title="About" />
+        <item
+            android:id="@+id/settings_fragment"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="Settings" />
+        <item
+            android:id="@+id/signoff_fragment"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:title="Sign Out" />
     </group>
 
     <item android:title="Sub items">

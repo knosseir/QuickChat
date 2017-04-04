@@ -1,6 +1,7 @@
 package com.example.admin.chatapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -15,7 +16,12 @@ public class AboutFragment extends android.support.v4.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if (container != null) {
+            container.removeAllViews();
+        }
         // Inflate the layout for this fragment
+        //Intent intent = new Intent(getContext(), AboutActivity.class);
+        //startActivity(intent);
         return inflater.inflate(R.layout.activity_about, container, false);
     }
 }
