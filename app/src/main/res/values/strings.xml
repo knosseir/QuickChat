@@ -95,4 +95,7 @@
     <string name="static_shortcut_disabled_message_settings">Disabled</string>
     <string name="about_blurb">QuickChat was created by Kareem Nosseir at LA Hacks 2017. QuickChat uses Firebase databases to send and receive messages to and from chatrooms.</string>
     <string name="attributions">QuickChat uses material icons from www.material.io/icons/</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

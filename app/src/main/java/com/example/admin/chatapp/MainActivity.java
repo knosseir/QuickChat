@@ -450,9 +450,9 @@ public class MainActivity extends AppCompatActivity {
         // Find our drawer view
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        //nvDrawer = (NavigationView) findViewById(R.id.nvView);
+        nvDrawer = (NavigationView) findViewById(R.id.nvView);
         // Setup drawer view
-       // setupDrawerContent(nvDrawer);
+        setupDrawerContent(nvDrawer);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -548,19 +548,20 @@ public class MainActivity extends AppCompatActivity {
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
         Class fragmentClass;
-        /*
+
         switch(menuItem.getItemId()) {
             case R.id.nav_first_fragment:
-                fragmentClass = FirstFragment.class;
+                Toast.makeText(getApplicationContext(), "menu", Toast.LENGTH_SHORT).show();
+                fragmentClass = AboutFragment.class;
                 break;
             case R.id.nav_second_fragment:
-                fragmentClass = SecondFragment.class;
+                fragmentClass = AboutFragment.class;
                 break;
             case R.id.nav_third_fragment:
-                fragmentClass = ThirdFragment.class;
+                fragmentClass = AboutFragment.class;
                 break;
             default:
-                fragmentClass = FirstFragment.class;
+                fragmentClass = AboutFragment.class;
         }
 
         try {
@@ -570,9 +571,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
-        */
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();      // TODO: Fragment launched is overlayed onto current Activity
+
         // Highlight the selected item has been done by NavigationView
         menuItem.setChecked(true);
         // Set action bar title
